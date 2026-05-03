@@ -1,0 +1,10 @@
+com\mycompany\strategy_y_templete_method\PersonajeApp.class
+com\mycompany\strategy_y_templete_method\VentanaPrincipal.class
+com\mycompany\strategy_y_templete_method\Correr.class
+com\mycompany\strategy_y_templete_method\DefenderAccion.class
+com\mycompany\strategy_y_templete_method\Saltar.class
+com\mycompany\strategy_y_templete_method\Caminar.class
+com\mycompany\strategy_y_templete_method\Movimiento.class
+com\mycompany\strategy_y_templete_method\AtacarAccion.class
+com\mycompany\strategy_y_templete_method\AccionPersonaje.class
+com\mycompany\strategy_y_templete_method\Personaje.class
