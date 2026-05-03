@@ -1,0 +1,753 @@
+======= Prompt 1 =======
+Genera un proyecto en Java usando Swing que muestre una interfaz gráfica simple.
+
+El programa debe simular un personaje en pantalla con botones para interactuar.
+
+Debe tener una ventana con:
+- Un área donde se muestre texto de acciones
+- Botones para ejecutar acciones
+
+El código debe estar completo y ser ejecutable.
+Usa buenas prácticas y estructura clara.
+
+===== Respuesta =====
+
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+// Clase principal
+public class PersonajeApp {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            new VentanaPrincipal();
+        });
+    }
+}
+
+// Clase de la ventana principal
+class VentanaPrincipal extends JFrame {
+
+    private JTextArea areaTexto;
+    private Personaje personaje;
+
+    public VentanaPrincipal() {
+        personaje = new Personaje("Héroe");
+
+        setTitle("Simulador de Personaje");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        initComponentes();
+
+        setVisible(true);
+    }
+
+    private void initComponentes() {
+        setLayout(new BorderLayout());
+
+        // Área de texto
+        areaTexto = new JTextArea();
+        areaTexto.setEditable(false);
+        areaTexto.setFont(new Font("Arial", Font.PLAIN, 14));
+        JScrollPane scrollPane = new JScrollPane(areaTexto);
+
+        add(scrollPane, BorderLayout.CENTER);
+
+        // Panel de botones
+        JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new GridLayout(1, 3));
+
+        JButton btnAtacar = new JButton("Atacar");
+        JButton btnDefender = new JButton("Defender");
+        JButton btnDescansar = new JButton("Descansar");
+
+        panelBotones.add(btnAtacar);
+        panelBotones.add(btnDefender);
+        panelBotones.add(btnDescansar);
+
+        add(panelBotones, BorderLayout.SOUTH);
+
+        // Eventos
+        btnAtacar.addActionListener(e -> mostrarAccion(personaje.atacar()));
+        btnDefender.addActionListener(e -> mostrarAccion(personaje.defender()));
+        btnDescansar.addActionListener(e -> mostrarAccion(personaje.descansar()));
+    }
+
+    private void mostrarAccion(String accion) {
+        areaTexto.append(accion + "\n");
+    }
+}
+
+// Clase modelo Personaje
+class Personaje {
+    private String nombre;
+    private int energia;
+
+    public Personaje(String nombre) {
+        this.nombre = nombre;
+        this.energia = 100;
+    }
+
+    public String atacar() {
+        if (energia >= 10) {
+            energia -= 10;
+            return nombre + " ataca! Energía restante: " + energia;
+        } else {
+            return nombre + " está demasiado cansado para atacar.";
+        }
+    }
+
+    public String defender() {
+        if (energia >= 5) {
+            energia -= 5;
+            return nombre + " se defiende. Energía restante: " + energia;
+        } else {
+            return nombre + " no tiene suficiente energía para defenderse.";
+        }
+    }
+
+    public String descansar() {
+        energia += 15;
+        if (energia > 100) energia = 100;
+        return nombre + " descansa. Energía recuperada: " + energia;
+    }
+}
+
+✅ Qué incluye
+Ventana gráfica (JFrame)
+Área de texto para mostrar acciones
+Botones:
+Atacar
+Defender
+Descansar
+Clase Personaje como modelo (separación básica tipo MVC)
+Manejo de eventos con ActionListener (lambdas)
+
+
+======= Prompt 2 =======
+
+Modifica el proyecto anterior para implementar el patrón Strategy.
+
+El personaje debe poder cambiar su forma de moverse en tiempo de ejecución.
+
+Crea una interfaz Movimiento con diferentes implementaciones:
+- Caminar
+- Correr
+- Saltar
+
+Agrega botones en la interfaz gráfica para cambiar la estrategia.
+
+Cuando se presione un botón, el personaje debe ejecutar el movimiento seleccionado y mostrarlo en pantalla.
+
+Entrega todo el código completo.
+
+
+===== Respuesta =====
+
+import javax.swing.*;
+import java.awt.*;
+
+// Clase principal
+public class PersonajeApp {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(VentanaPrincipal::new);
+    }
+}
+
+// ===== INTERFAZ STRATEGY =====
+interface Movimiento {
+    String mover(String nombre);
+}
+
+// ===== IMPLEMENTACIONES =====
+class Caminar implements Movimiento {
+    @Override
+    public String mover(String nombre) {
+        return nombre + " está caminando 🚶";
+    }
+}
+
+class Correr implements Movimiento {
+    @Override
+    public String mover(String nombre) {
+        return nombre + " está corriendo 🏃";
+    }
+}
+
+class Saltar implements Movimiento {
+    @Override
+    public String mover(String nombre) {
+        return nombre + " está saltando 🤸";
+    }
+}
+
+// ===== MODELO =====
+class Personaje {
+    private String nombre;
+    private Movimiento movimiento;
+
+    public Personaje(String nombre) {
+        this.nombre = nombre;
+        this.movimiento = new Caminar(); // por defecto
+    }
+
+    public void setMovimiento(Movimiento movimiento) {
+        this.movimiento = movimiento;
+    }
+
+    public String ejecutarMovimiento() {
+        return movimiento.mover(nombre);
+    }
+}
+
+// ===== VISTA =====
+class VentanaPrincipal extends JFrame {
+
+    private JTextArea areaTexto;
+    private Personaje personaje;
+
+    public VentanaPrincipal() {
+        personaje = new Personaje("Héroe");
+
+        setTitle("Strategy - Movimiento de Personaje");
+        setSize(500, 350);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        initComponentes();
+        setVisible(true);
+    }
+
+    private void initComponentes() {
+        setLayout(new BorderLayout());
+
+        // Área de texto
+        areaTexto = new JTextArea();
+        areaTexto.setEditable(false);
+        areaTexto.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(new JScrollPane(areaTexto), BorderLayout.CENTER);
+
+        // Panel de botones
+        JPanel panel = new JPanel(new GridLayout(2, 2, 10, 10));
+
+        JButton btnCaminar = new JButton("Caminar");
+        JButton btnCorrer = new JButton("Correr");
+        JButton btnSaltar = new JButton("Saltar");
+        JButton btnEjecutar = new JButton("Ejecutar Movimiento");
+
+        panel.add(btnCaminar);
+        panel.add(btnCorrer);
+        panel.add(btnSaltar);
+        panel.add(btnEjecutar);
+
+        add(panel, BorderLayout.SOUTH);
+
+        // Eventos Strategy
+        btnCaminar.addActionListener(e -> {
+            personaje.setMovimiento(new Caminar());
+            mostrar("Estrategia cambiada a CAMINAR");
+        });
+
+        btnCorrer.addActionListener(e -> {
+            personaje.setMovimiento(new Correr());
+            mostrar("Estrategia cambiada a CORRER");
+        });
+
+        btnSaltar.addActionListener(e -> {
+            personaje.setMovimiento(new Saltar());
+            mostrar("Estrategia cambiada a SALTAR");
+        });
+
+        btnEjecutar.addActionListener(e -> mostrar(personaje.ejecutarMovimiento()));
+    }
+
+    private void mostrar(String texto) {
+        areaTexto.append(texto + "\n");
+    }
+}
+
+🔥 Qué cambió (lo importante)
+Se creó la interfaz Movimiento (la estrategia)
+Se implementaron:
+Caminar
+Correr
+Saltar
+El Personaje ahora no sabe cómo moverse, delega el comportamiento a la estrategia
+Puedes cambiar el comportamiento en tiempo de ejecución con botones
+🎮 Cómo funciona ahora
+Presionas:
+Caminar / Correr / Saltar → cambia la estrategia
+Presionas:
+Ejecutar Movimiento → ejecuta la estrategia actual
+🧠 Concepto clave (para tu entrega)
+
+Este proyecto demuestra que:
+
+Strategy permite cambiar comportamiento dinámicamente
+Evita condicionales tipo if/else en el personaje
+Cumple principio Open/Closed (SOLID)
+
+
+
+======= Prompt 3 =======
+
+Ahora implementa el patrón Template Method en el mismo proyecto.
+
+Crea una clase abstracta AccionPersonaje que defina el algoritmo:
+
+- iniciar()
+- ejecutarAccion() (abstracto)
+- finalizar()
+
+Luego crea al menos dos clases concretas que implementen ejecutarAccion().
+
+Agrega botones en la interfaz para ejecutar estas acciones.
+
+El flujo debe mostrarse en pantalla indicando cada paso del algoritmo.
+
+Entrega todo el código completo.
+
+
+===== Respuesta =====
+
+import javax.swing.*;
+import java.awt.*;
+
+// Clase principal
+public class PersonajeApp {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(VentanaPrincipal::new);
+    }
+}
+
+// ===== STRATEGY =====
+interface Movimiento {
+    String mover(String nombre);
+}
+
+class Caminar implements Movimiento {
+    public String mover(String nombre) {
+        return nombre + " está caminando 🚶";
+    }
+}
+
+class Correr implements Movimiento {
+    public String mover(String nombre) {
+        return nombre + " está corriendo 🏃";
+    }
+}
+
+class Saltar implements Movimiento {
+    public String mover(String nombre) {
+        return nombre + " está saltando 🤸";
+    }
+}
+
+// ===== TEMPLATE METHOD =====
+abstract class AccionPersonaje {
+
+    // Template Method
+    public final String realizarAccion(String nombre) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(iniciar(nombre)).append("\n");
+        sb.append(ejecutarAccion(nombre)).append("\n");
+        sb.append(finalizar(nombre));
+        return sb.toString();
+    }
+
+    protected String iniciar(String nombre) {
+        return nombre + " se prepara...";
+    }
+
+    protected abstract String ejecutarAccion(String nombre);
+
+    protected String finalizar(String nombre) {
+        return nombre + " termina la acción.";
+    }
+}
+
+class AtacarAccion extends AccionPersonaje {
+    protected String ejecutarAccion(String nombre) {
+        return nombre + " lanza un ataque poderoso ⚔️";
+    }
+}
+
+class DefenderAccion extends AccionPersonaje {
+    protected String ejecutarAccion(String nombre) {
+        return nombre + " levanta un escudo 🛡️";
+    }
+}
+
+// ===== MODELO =====
+class Personaje {
+    private String nombre;
+    private Movimiento movimiento;
+
+    public Personaje(String nombre) {
+        this.nombre = nombre;
+        this.movimiento = new Caminar();
+    }
+
+    public void setMovimiento(Movimiento movimiento) {
+        this.movimiento = movimiento;
+    }
+
+    public String ejecutarMovimiento() {
+        return movimiento.mover(nombre);
+    }
+
+    public String ejecutarAccion(AccionPersonaje accion) {
+        return accion.realizarAccion(nombre);
+    }
+}
+
+// ===== VISTA =====
+class VentanaPrincipal extends JFrame {
+
+    private JTextArea areaTexto;
+    private Personaje personaje;
+
+    public VentanaPrincipal() {
+        personaje = new Personaje("Héroe");
+
+        setTitle("Strategy + Template Method");
+        setSize(550, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        initComponentes();
+        setVisible(true);
+    }
+
+    private void initComponentes() {
+        setLayout(new BorderLayout());
+
+        areaTexto = new JTextArea();
+        areaTexto.setEditable(false);
+        areaTexto.setFont(new Font("Arial", Font.PLAIN, 14));
+        add(new JScrollPane(areaTexto), BorderLayout.CENTER);
+
+        JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
+
+        JButton btnCaminar = new JButton("Caminar");
+        JButton btnCorrer = new JButton("Correr");
+        JButton btnSaltar = new JButton("Saltar");
+        JButton btnMover = new JButton("Ejecutar Movimiento");
+
+        JButton btnAtacar = new JButton("Atacar (Template)");
+        JButton btnDefender = new JButton("Defender (Template)");
+
+        panel.add(btnCaminar);
+        panel.add(btnCorrer);
+        panel.add(btnSaltar);
+        panel.add(btnMover);
+        panel.add(btnAtacar);
+        panel.add(btnDefender);
+
+        add(panel, BorderLayout.SOUTH);
+
+        // Strategy eventos
+        btnCaminar.addActionListener(e -> {
+            personaje.setMovimiento(new Caminar());
+            mostrar("Estrategia: CAMINAR");
+        });
+
+        btnCorrer.addActionListener(e -> {
+            personaje.setMovimiento(new Correr());
+            mostrar("Estrategia: CORRER");
+        });
+
+        btnSaltar.addActionListener(e -> {
+            personaje.setMovimiento(new Saltar());
+            mostrar("Estrategia: SALTAR");
+        });
+
+        btnMover.addActionListener(e -> mostrar(personaje.ejecutarMovimiento()));
+
+        // Template Method eventos
+        btnAtacar.addActionListener(e -> {
+            AccionPersonaje accion = new AtacarAccion();
+            mostrar(personaje.ejecutarAccion(accion));
+        });
+
+        btnDefender.addActionListener(e -> {
+            AccionPersonaje accion = new DefenderAccion();
+            mostrar(personaje.ejecutarAccion(accion));
+        });
+    }
+
+    private void mostrar(String texto) {
+        areaTexto.append(texto + "\n\n");
+    }
+}
+
+🧩 Qué agregué (Template Method)
+Clase abstracta AccionPersonaje con el algoritmo:
+iniciar()
+ejecutarAccion() (abstracto)
+finalizar()
+Método plantilla: realizarAccion()
+Implementaciones concretas:
+AtacarAccion
+DefenderAccion
+🎮 En la interfaz ahora puedes:
+Cambiar movimiento (Strategy)
+Ejecutar movimiento
+Ejecutar acciones con Template Method:
+Atacar (Template)
+Defender (Template)
+📺 Qué verás en pantalla (ejemplo)
+
+Cuando presionas Atacar (Template):
+
+Héroe se prepara...
+Héroe lanza un ataque poderoso ⚔️
+Héroe termina la acción.
+🧠 Clave para tu entrega
+Strategy → cambia comportamiento COMPLETO en runtime
+Template Method → fija el algoritmo, pero permite variar un paso
+
+
+======= Prompt 4 =======
+
+Mejora la interfaz gráfica para que se vea claramente la diferencia entre Strategy y Template Method.
+
+Divide la ventana en dos secciones:
+- Una para Strategy
+- Otra para Template Method
+
+Cada sección debe tener sus propios botones y mostrar sus resultados.
+
+Agrega títulos y organización visual clara.
+
+Entrega el código completo y funcional.
+
+
+===== Respuesta =====
+
+import javax.swing.*;
+import java.awt.*;
+
+// Clase principal
+public class PersonajeApp {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(VentanaPrincipal::new);
+    }
+}
+
+// ===== STRATEGY =====
+interface Movimiento {
+    String mover(String nombre);
+}
+
+class Caminar implements Movimiento {
+    public String mover(String nombre) {
+        return nombre + " está caminando";
+    }
+}
+
+class Correr implements Movimiento {
+    public String mover(String nombre) {
+        return nombre + " está corriendo";
+    }
+}
+
+class Saltar implements Movimiento {
+    public String mover(String nombre) {
+        return nombre + " está saltando";
+    }
+}
+
+// ===== TEMPLATE METHOD =====
+abstract class AccionPersonaje {
+
+    public final String realizarAccion(String nombre) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(iniciar(nombre)).append("\n");
+        sb.append(ejecutarAccion(nombre)).append("\n");
+        sb.append(finalizar(nombre));
+        return sb.toString();
+    }
+
+    protected String iniciar(String nombre) {
+        return nombre + " se prepara...";
+    }
+
+    protected abstract String ejecutarAccion(String nombre);
+
+    protected String finalizar(String nombre) {
+        return nombre + " termina la acción.";
+    }
+}
+
+class AtacarAccion extends AccionPersonaje {
+    protected String ejecutarAccion(String nombre) {
+        return nombre + " lanza un ataque poderoso";
+    }
+}
+
+class DefenderAccion extends AccionPersonaje {
+    protected String ejecutarAccion(String nombre) {
+        return nombre + " levanta un escudo";
+    }
+}
+
+// ===== MODELO =====
+class Personaje {
+    private String nombre;
+    private Movimiento movimiento;
+
+    public Personaje(String nombre) {
+        this.nombre = nombre;
+        this.movimiento = new Caminar();
+    }
+
+    public void setMovimiento(Movimiento movimiento) {
+        this.movimiento = movimiento;
+    }
+
+    public String ejecutarMovimiento() {
+        return movimiento.mover(nombre);
+    }
+
+    public String ejecutarAccion(AccionPersonaje accion) {
+        return accion.realizarAccion(nombre);
+    }
+}
+
+// ===== VISTA =====
+class VentanaPrincipal extends JFrame {
+
+    private JTextArea areaStrategy;
+    private JTextArea areaTemplate;
+    private Personaje personaje;
+
+    public VentanaPrincipal() {
+        personaje = new Personaje("Héroe");
+
+        setTitle("Strategy vs Template Method");
+        setSize(800, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        initComponentes();
+        setVisible(true);
+    }
+
+    private void initComponentes() {
+        setLayout(new GridLayout(1, 2));
+
+        // ===== PANEL STRATEGY =====
+        JPanel panelStrategy = new JPanel(new BorderLayout());
+        panelStrategy.setBorder(BorderFactory.createTitledBorder("STRATEGY (Cambio de comportamiento dinámico)"));
+
+        areaStrategy = new JTextArea();
+        areaStrategy.setEditable(false);
+        panelStrategy.add(new JScrollPane(areaStrategy), BorderLayout.CENTER);
+
+        JPanel botonesStrategy = new JPanel(new GridLayout(2, 2, 5, 5));
+
+        JButton btnCaminar = new JButton("Caminar");
+        JButton btnCorrer = new JButton("Correr");
+        JButton btnSaltar = new JButton("Saltar");
+        JButton btnMover = new JButton("Ejecutar");
+
+        botonesStrategy.add(btnCaminar);
+        botonesStrategy.add(btnCorrer);
+        botonesStrategy.add(btnSaltar);
+        botonesStrategy.add(btnMover);
+
+        panelStrategy.add(botonesStrategy, BorderLayout.SOUTH);
+
+        // ===== PANEL TEMPLATE =====
+        JPanel panelTemplate = new JPanel(new BorderLayout());
+        panelTemplate.setBorder(BorderFactory.createTitledBorder("TEMPLATE METHOD (Algoritmo fijo, pasos variables)"));
+
+        areaTemplate = new JTextArea();
+        areaTemplate.setEditable(false);
+        panelTemplate.add(new JScrollPane(areaTemplate), BorderLayout.CENTER);
+
+        JPanel botonesTemplate = new JPanel(new GridLayout(1, 2, 5, 5));
+
+        JButton btnAtacar = new JButton("Atacar");
+        JButton btnDefender = new JButton("Defender");
+
+        botonesTemplate.add(btnAtacar);
+        botonesTemplate.add(btnDefender);
+
+        panelTemplate.add(botonesTemplate, BorderLayout.SOUTH);
+
+        add(panelStrategy);
+        add(panelTemplate);
+
+        // ===== EVENTOS STRATEGY =====
+        btnCaminar.addActionListener(e -> {
+            personaje.setMovimiento(new Caminar());
+            mostrarStrategy("Estrategia cambiada a CAMINAR");
+        });
+
+        btnCorrer.addActionListener(e -> {
+            personaje.setMovimiento(new Correr());
+            mostrarStrategy("Estrategia cambiada a CORRER");
+        });
+
+        btnSaltar.addActionListener(e -> {
+            personaje.setMovimiento(new Saltar());
+            mostrarStrategy("Estrategia cambiada a SALTAR");
+        });
+
+        btnMover.addActionListener(e -> mostrarStrategy(personaje.ejecutarMovimiento()));
+
+        // ===== EVENTOS TEMPLATE =====
+        btnAtacar.addActionListener(e -> {
+            AccionPersonaje accion = new AtacarAccion();
+            mostrarTemplate(personaje.ejecutarAccion(accion));
+        });
+
+        btnDefender.addActionListener(e -> {
+            AccionPersonaje accion = new DefenderAccion();
+            mostrarTemplate(personaje.ejecutarAccion(accion));
+        });
+    }
+
+    private void mostrarStrategy(String texto) {
+        areaStrategy.append(texto + "\n");
+    }
+
+    private void mostrarTemplate(String texto) {
+        areaTemplate.append(texto + "\n\n");
+    }
+}
+
+
+🎯 Qué cambió visualmente
+
+Ahora la ventana está dividida en dos secciones independientes:
+
+🟦 IZQUIERDA → STRATEGY
+Título explicativo
+Botones:
+Caminar
+Correr
+Saltar
+Ejecutar
+Área de texto propia (solo muestra Strategy)
+
+👉 Aquí ves cómo cambia el comportamiento en tiempo real
+
+🟩 DERECHA → TEMPLATE METHOD
+Título explicativo
+Botones:
+Atacar
+Defender
+Área de texto independiente
+
+👉 Aquí ves el flujo fijo del algoritmo paso a paso
+
+🧠 Diferencia ahora se ve CLARÍSIMA
+Strategy → cambia qué hace
+Template → mantiene el flujo, cambia cómo se ejecuta un paso
